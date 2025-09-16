@@ -150,15 +150,17 @@ apt install cuda-toolkit;
 make
 git clone https://github.com/8891689/keyKiller-Cuda.git
 ```
-## Community benchmarks
+## Local test based on 1030
 
 1. Address and HASH160 Mode
 ```bash
 
 | GPU               | Grid      | Speed (Mkeys/s) | Notes        |
 | RTX1030           | 512,512   | 49.4 Mkeys/s    | My test      |
+```
 
 2. Public Key Mode
+```bash
 
 | GPU               | Grid      | Speed (Mkeys/s) | Notes        |
 | RTX1030           | 512,512   | 99.6 Mkeys/s    | My test      |
