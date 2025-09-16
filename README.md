@@ -1,13 +1,13 @@
-# keyKiller Cuda
+# KeyKiller Cuda
 
-keyKiller is the GPU-powered version of the keyKiller project, designed to achieve extreme performance in solving Satoshi puzzles on modern NVIDIA GPUs. 
-Leveraging CUDA, warp-level parallelism, and batch EC operations, keyKiller CUDA pushes the limits of cryptographic key search.
+KeyKiller is the GPU-powered version of the KeyKiller project, designed to achieve extreme performance in solving Satoshi puzzles on modern NVIDIA GPUs. 
+Leveraging CUDA, warp-level parallelism, and batch EC operations, KeyKiller CUDA pushes the limits of cryptographic key search.
 
 1. The Secp256k1 algorithm is based on the excellent work of [JeanLucPons/VanitySearch](https://github.com/JeanLucPons/VanitySearch) ， [FixedPaul/VanitySearch-Bitcrack](https://github.com/FixedPaul)，[KeyHunt-Cuda](https://github.com/Qalander/KeyHunt-Cuda), [CUDACyclone](https://github.com/Dookoo2/CUDACyclone) ，This implementation is inspired and referenced by the above implementations. Contributions are welcome! The algorithm has been significantly modified for CUDA. Special thanks to Jean-Luc Pons for his pioneering contributions to the cryptography community.
 
-2. keyKiller GPU-based solution to Satoshi's puzzle. This is an experimental project, Please look at it rationally! 
+2. KeyKiller GPU-based solution to Satoshi's puzzle. This is an experimental project, Please look at it rationally! 
 
-3. While keyKiller CUDA is simple to use, it leverages massive GPU parallelism** to achieve extreme performance in elliptic curve calculations, compressed public keys, and Hash160 pipelines.
+3. While KeyKiller CUDA is simple to use, it leverages massive GPU parallelism** to achieve extreme performance in elliptic curve calculations, compressed public keys, and Hash160 pipelines.
 
 4. Theoretically, the best configuration for 4090 is -g 128,128 -s 16, but this needs to be tested on the actual platform. Each platform environment is different and the results obtained are also different. It is best to adjust it yourself and use the -g value that is fastest!
 
@@ -57,7 +57,7 @@ Help:
 
 ## Example Output
 
-Below is a sample run of keyKiller for reference.
+Below is a sample run of KeyKiller for reference.
 
 **RTX4060**
 
@@ -132,7 +132,7 @@ mode 2               : Incremental mode
 Time: 61.2 s | Speed: 1234.3 Mkeys/s | Count: 72707573152 | Progress: 52.90 %
 
 Gong Xi Fa Cai       ：Matching success
-Pub Hex              : 00000000000000000000000000000000000000000000000000000022382FACD0
+Key Hex              : 00000000000000000000000000000000000000000000000000000022382FACD0
 Pub Hex              : 03C060E1E3771CBECCB38E119C2414702F3F5181A89652538851D2E3886BDD70C6
 ```
 ## Compile
@@ -148,7 +148,7 @@ apt-get install -y gcc;
 apt-get install -y make;
 apt install cuda-toolkit;
 make
-git clone https://github.com/8891689/keyKiller-Cuda.git
+git clone https://github.com/8891689/KeyKiller-Cuda.git
 ```
 ## Local test based on 1030
 
