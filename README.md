@@ -48,9 +48,9 @@ Help:
 ```
 ## Options
 - **-r**: range of search. Must be a power of two!
-- **-a**: Given a Find the private key of the P2PKH Bitcoin address.
-- **-h**: Given a Find the private key of the encrypted public key (HASH160) hash value, as fast as the address.
-- **-p**: Given a public key, find the private key of the 33-byte compressed public key。
+- **-a**: Given a P2PKH Bitcoin address, crack its private key.
+- **-h**: Given a hash value (HASH160) of an encrypted public key, crack its private key, as fast as the address.
+- **-p**: Given a public key, crack its private key. It must be a compressed public key.
 - **-g**: very usefull parameter. Example -g 512,512 - first 512 - number of points each thread will process in one batch (Points batch size)., second 512 - number of threads in one group (Threads per batch).
 - **-s**: batch per thread for one kernel launch.
 - **-R**: Random search mode. N is the number of keys in millions per random starting point. Runs indefinitely.
