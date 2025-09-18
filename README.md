@@ -3,13 +3,13 @@
 KeyKiller is the GPU-powered version of the KeyKiller project, designed to achieve extreme performance in solving Satoshi puzzles on modern NVIDIA GPUs. 
 Leveraging CUDA, warp-level parallelism, and batch EC operations, KeyKiller CUDA pushes the limits of cryptographic key search.
 
-1. The Secp256k1 algorithm is based on the excellent work of [JeanLucPons/VanitySearch](https://github.com/JeanLucPons/VanitySearch) ， [FixedPaul/VanitySearch-Bitcrack](https://github.com/FixedPaul)，[KeyHunt-Cuda](https://github.com/Qalander/KeyHunt-Cuda), [CUDACyclone](https://github.com/Dookoo2/CUDACyclone) ，This implementation is inspired and referenced by the above implementations. Contributions are welcome! The algorithm has been significantly modified for CUDA. Special thanks to Jean-Luc Pons for his pioneering contributions to the cryptography community.
+1. The Secp256k1 algorithm is based on the excellent work of [JeanLucPons/VanitySearch](https://github.com/JeanLucPons/VanitySearch) ， [FixedPaul/VanitySearch-Bitcrack](https://github.com/FixedPaul)，This implementation is inspired and referenced by the above implementations. Contributions are welcome! The algorithm has been significantly modified for CUDA. Special thanks to Jean-Luc Pons for his pioneering contributions to the cryptography community.
 
 2. KeyKiller GPU-based solution to Satoshi's puzzle. This is an experimental project, Please look at it rationally! 
 
 3. While KeyKiller CUDA is simple to use, it leverages massive GPU parallelism** to achieve extreme performance in elliptic curve calculations, compressed public keys, and Hash160 pipelines.
 
-4. Theoretically, the best configuration for 4090 is -g 128,128 -s 16, but this needs to be tested on the actual platform. Each platform environment is different and the results obtained are also different. It is best to adjust it yourself and use the -g value that is fastest!
+4. In theory, 4090 automatically configures the size, and the theoretical speed is about 6G, but this needs to be tested on the actual platform. Each platform environment is different, and the results obtained are also different. 
 
 
 ## Key Features
@@ -17,136 +17,127 @@ Leveraging CUDA, warp-level parallelism, and batch EC operations, KeyKiller CUDA
 1. GPU Acceleration: Optimized for NVIDIA GPUs with full CUDA support.
 2. Massive Parallelism: Tens of thousands of threads computing elliptic curve points and hash160 simultaneously.
 3. Batch EC Operations: Efficient group addition and modular inversion with warp-level optimizations.
-4. Grid/Batch Control: Fully configurable GPU execution with `-g` parameter (threads per batch × points per batch).
-5. Cross-Platform: Works on Linux and Windows (via WSL2 or MinGW cross-compilation).
-6. Cross Architecture: Automatic compilation for different architectures (75 86 89 90).
-7. Extremely low VRAM usage: Key feature! For low price rented GPU.
+4. Grid/Batch Control: Use GPU execution with automatically configured parameters (number of threads per batch × number of points per batch).
+5. Cross-Platform: Works on Linux and Windows .
+6. -R command random mode does not slow down, high-speed calculation.
+7. Incremental mode, with -b breakpoint save progress mode so you can continue working when you have time.
+
 
 ## User Manual
 ```bash
 ./kk -h
-Usage: ./kk -r <start_hex>:<end_hex> {-a <b58> | -h <hash160_hex> | -p <pubkey_hex>} [-R N] [-g A,B] [-s N] [-help|--help]
+Usage: ./kk -r <bits> [-a <b58_addr> | -p <pubkey>] [options]
 
-Modes (choose one target type):
-  -a <b58_addr>              : Find private key for a P2PKH Bitcoin address.
-  -h <hex>                   : Find private key for a 160-bit hash (RIPEMD160(SHA256(pubkey))).
-  -p <hex>                   : Find private key for a 33-byte compressed public key.
+Modes (choose one):
+  -a <b58_addr>       Find the private key for a P2PKH Bitcoin address.
+  -p <pubkey>         Find the private key for a specific public key (hex, compressed format only).
 
-Search Options:
-  -r <start>:<end>           : Hex range of private keys to search (must be power of 2).
-  -R <N>                     : Random search mode. N is the number of keys in millions
-                               per random starting point. Runs indefinitely.
+Keyspace:
+  -r <bits>           Set the bit range for the search (e.g., 71 for 2^70 to 2^71-1) (required).
 
-Performance Tuning:
-  -g <A,B>                   : Set points batch size (A) and batches per SM (B).
-                               A must be a power of two. Default: 128,8
-  -s <N>                     : Set number of batches per kernel launch. Default: 64
+Options:
+  -R                  Activate random mode.
+  -b                  Enable backup mode to resume from last progress (not for random mode).
+  -G <ID>             Specify the GPU ID to use, default is 0.
+  -h, --help          Display this help message.
 
-Help:
--help , --help               : Show this help message！Technical support : github.com/8891689
+Technical Support: github.com/8891689
 
 ```
 ## Options
-- **-r**: range of search. Must be a power of two!
 - **-a**: Given a P2PKH Bitcoin address, crack its private key.
-- **-h**: Given a hash value (HASH160) of an encrypted public key, crack its private key, as fast as the address.
 - **-p**: Given a public key, crack its private key. It must be a compressed public key.
-- **-g**: very usefull parameter. Example -g 512,512 - first 512 - number of points each thread will process in one batch (Points batch size)., second 512 - number of threads in one group (Threads per batch).
-- **-s**: batch per thread for one kernel launch.
-- **-R**: Random search mode. N is the number of keys in millions per random starting point. Runs indefinitely.
+- **-r**: range of search. Must be a power of two!Set the bit range for the search (e.g., 71 for 2^70 to 2^71-1) (required).
+- **-R**: Activate random mode.
+- **-b**: Enable backup mode to resume from last progress (not for random mode).
+- **-G**: Specify the GPU ID to use, default is 0.
 
 ## Example Output
 
 Below is a sample run of KeyKiller for reference.
 
-**RTX4060**
+**RTX1030**
 
 ```bash
-./kk -r 2000000000:3FFFFFFFFF -a 1HBtApAFA9B2YZw3G2YKSMCtb3dVnjuNe2 -g 512,256
-GPU Information      : PASS 
-Device               : NVIDIA GeForce RTX 4060 (compute 8.9)
-SM                   : 24
-ThreadsPerBlock      : 256
-Blocks               : 4096
-Points batch size    : 512
-Batches/SM           : 256
-Memory utilization   : 6.9% (538.3 MB / 7.63 GB) 
-Total threads        : 1048576
-Time: 8.0 s | Speed: 1268.9 Mkeys/s | Count: 10204470016 | Progress: 7.42 %
+./kk -r 33 -a 187swFMjz1G54ycVU56B7jZFHFTNVQFDiu
+[+] KeyKiller v.007
+[+] Search: 187swFMjz1G54ycVU56B7jZFHFTNVQFDiu [P2PKH/Compressed]
+[+] Start Fri Sep 19 04:40:53 2025
+[+] Range (2^33)
+[+] from : 0x100000000
+[+] to   : 0x1FFFFFFFF
+[+] GPU: GPU #0 NVIDIA GeForce GT 1030 (3x128 cores) Grid(256x256)
+[+] Starting keys set in 0.02 seconds
+[+] GPU 57.61 Mkey/s][Total 2^31.39][Prob 65.62%] [50% in seconds][Found 0]  
 
-Gong Xi Fa Cai       ：Matching success
-Key Hex              : 00000000000000000000000000000000000000000000000000000022382FACD0
-Pub Hex              : 03C060E1E3771CBECCB38E119C2414702F3F5181A89652538851D2E3886BDD70C6
+[!] (Add): 187swFMjz1G54ycVU56B7jZFHFTNVQFDiu
+[!] (WIF): p2pkh:KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9MDGKrXXQL647jj
+[!] (HEX): 0x00000000000000000000000000000000000000000000000000000001A96CA8D8
+
 ```
 
-**RTX4090**
+**RTX1030**
 ```bash
-./kk -r 200000000000:3fffffffffff -a 1F3JRMWudBaj48EhwcHDdpeuy2jwACNxjP -g 128,128 -s 16
-GPU Information      : PASS 
-Device               : NVIDIA GeForce RTX 4090 (compute 8.9)
-SM                   : 128
-ThreadsPerBlock      : 256
-Blocks               : 16384
-Points batch size    : 128
-Batches/SM           : 128
-Batches/launch       : 16 (per thread)
-Memory utilization   : 4.8% (1.14 GB / 23.6 GB)
-Total threads        : 4194304
-mode 2               : Incremental mode
-Time: 393.7 s | Speed: 6127.4 Mkeys/s | Count: 2421341587872 | Progress: 6.88 %
+./kk -r 33 -a 187swFMjz1G54ycVU56B7jZFHFTNVQFDiu -R
+[+] KeyKiller v.007
+[+] Search: 187swFMjz1G54ycVU56B7jZFHFTNVQFDiu [P2PKH/Compressed]
+[+] Start Fri Sep 19 04:41:56 2025
+[+] Random mode
+[+] Range (2^33)
+[+] from : 0x100000000
+[+] to   : 0x1FFFFFFFF
+[+] GPU: GPU #0 NVIDIA GeForce GT 1030 (3x128 cores) Grid(384x256)
+[+] Starting keys set in 0.03 seconds
+[+] [GPU 56.93 Mkey/s][Total 2^31.94][Prob 9.6e+01%][50% in seconds][Found 0]  
 
-Gong Xi Fa Cai       ：Matching success
-Key Hex              : 00000000000000000000000000000000000000000000000000002EC18388D544
-Pub Hex              : 03FD5487722D2576CB6D7081426B66A3E2986C1CE8358D479063FB5F2BB6DD5849
+[!] (Add): 187swFMjz1G54ycVU56B7jZFHFTNVQFDiu
+[!] (WIF): p2pkh:KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9MDGKrXXQL647jj
+[!] (HEX): 0x00000000000000000000000000000000000000000000000000000001A96CA8D8
+
 ```
-**RTX5090**
+**RTX1030**
 ```bash
-./kk -r 200000000000:3fffffffffff -a 1F3JRMWudBaj48EhwcHDdpeuy2jwACNxjP -g 128,256
-GPU Information      : PASS 
-Device               : NVIDIA GeForce RTX 5090 (compute 12.0)
-SM                   : 170
-ThreadsPerBlock      : 256
-Blocks               : 1024
-Points batch size    : 128
-Batches/SM           : 8
-Memory utilization   : 1.7% (557.3 MB / 31.4 GB) 
-Total threads        : 262144
-mode 2               : Incremental mode
-Time: 7.0 s | Speed: 8408.0 Mkeys/s | Count: 58545467200 | Progress: 0.17 % ^C
+./kk -r 31 -p 0387dc70db1806cd9a9a76637412ec11dd998be666584849b3185f7f9313c8fd28
+[+] KeyKiller v.007
+[+] Search: 0387dc70db1806cd9a9a76637412ec11dd998be666584849b3185f7f9313c8fd28 [Public Key]
+[+] Start Fri Sep 19 04:59:25 2025
+[+] Range (2^31)
+[+] from : 0x40000000
+[+] to   : 0x7FFFFFFF
+[+] GPU: GPU #0 NVIDIA GeForce GT 1030 (3x128 cores) Grid(256x256)
+[+] Starting keys set in 0.02 seconds
+[+] GPU 100.04 Mkey/s][Total 2^29.17][Prob 56.25%] [50% in seconds][Found 0]  
+
+[!] (Pub): 0387dc70db1806cd9a9a76637412ec11dd998be666584849b3185f7f9313c8fd28
+[!] (WIF): Compressed:KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M9SmFMSCA4jQRW
+[!] (HEX): 0x000000000000000000000000000000000000000000000000000000007D4FE747
 
 ```
-**RTX3070 mobile**
+
+**RTX1030**
+
 ```bash
-./kk -r 2000000000:3FFFFFFFFF -a 1HBtApAFA9B2YZw3G2YKSMCtb3dVnjuNe2 -g 512,256
-GPU Information      : PASS 
-Device               : NVIDIA GeForce RTX 3070 Laptop GPU (compute 8.6)
-SM                   : 40
-ThreadsPerBlock      : 256
-Blocks               : 8192
-Points batch size    : 512
-Batches/SM           : 256
-Batches/launch       : 64 (per thread)
-Memory utilization   : 64.0% (5.12 GB / 8.00 GB)
-Total threads        : 2097152
-mode 2               : Incremental mode
-Time: 61.2 s | Speed: 1234.3 Mkeys/s | Count: 72707573152 | Progress: 52.90 %
+./kk -r 31 -p 0387dc70db1806cd9a9a76637412ec11dd998be666584849b3185f7f9313c8fd28 -R
+[+] KeyKiller v.007
+[+] Search: 0387dc70db1806cd9a9a76637412ec11dd998be666584849b3185f7f9313c8fd28 [Public Key]
+[+] Start Fri Sep 19 04:57:39 2025
+[+] Random mode
+[+] Range (2^31)
+[+] from : 0x40000000
+[+] to   : 0x7FFFFFFF
+[+] GPU: GPU #0 NVIDIA GeForce GT 1030 (3x128 cores) Grid(384x256)
+[+] Starting keys set in 0.03 seconds
+[+] [GPU 98.95 Mkey/s][Total 2^26.58][Prob 9.4e+00%][50% in seconds][Found 0]  
 
-Gong Xi Fa Cai       ：Matching success
-Key Hex              : 00000000000000000000000000000000000000000000000000000022382FACD0
-Pub Hex              : 03C060E1E3771CBECCB38E119C2414702F3F5181A89652538851D2E3886BDD70C6
+[!] (Pub): 0387dc70db1806cd9a9a76637412ec11dd998be666584849b3185f7f9313c8fd28
+[!] (WIF): Compressed:KwDiBf89QgGbjEhKnhXJuH7LrciVrZi3qYjgd9M9SmFMSCA4jQRW
+[!] (HEX): 0x000000000000000000000000000000000000000000000000000000007D4FE747
+
 ```
+
 ## Compile
 
 ```bash
-apt update;
-apt-get install -y joe;
-apt-get install -y zip;
-apt-get install -y screen;
-apt-get install -y curl libcurl4;
-apt-get install build-essential;
-apt-get install -y gcc;
-apt-get install -y make;
-apt install cuda-toolkit;
 make
 git clone https://github.com/8891689/KeyKiller-Cuda.git
 ```
@@ -156,14 +147,14 @@ git clone https://github.com/8891689/KeyKiller-Cuda.git
 ```bash
 
 | GPU               | Grid      | Speed (Mkeys/s) | Notes        |
-| RTX1030           | 512,512   | 49.4 Mkeys/s    | My test      |
+| RTX1030           | 256,256   | 56 Mkeys/s    | My test      |
 ```
 
 2. Public Key Mode
 ```bash
 
 | GPU               | Grid      | Speed (Mkeys/s) | Notes        |
-| RTX1030           | 512,512   | 99.6 Mkeys/s    | My test      |
+| RTX1030           | 256,256   | 99.6 Mkeys/s    | My test      |
 
 ```
 # Sponsorship
