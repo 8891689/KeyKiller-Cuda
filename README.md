@@ -139,7 +139,8 @@ Below is a sample run of KeyKiller for reference.
 ## Compile
 
 ```bash
-make
+make all
+
 git clone https://github.com/8891689/KeyKiller-Cuda.git
 ```
 ## Local test based on 1030
