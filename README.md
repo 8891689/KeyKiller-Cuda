@@ -10,7 +10,7 @@ Leveraging CUDA, warp-level parallelism, and batch EC operations, KeyKiller CUDA
 3. While KeyKiller CUDA is simple to use, it leverages massive GPU parallelism** to achieve extreme performance in elliptic curve calculations, compressed public keys, and Hash160 pipelines.
 
 4. In theory, 4090 automatically configures the size, and the theoretical speed is about 6G, but this needs to be tested on the actual platform. Each platform environment is different, and the results obtained are also different. 
-
+5. This program is still in the testing stage and may have unknown issues. It will continue to be improved and deeply optimized.
 
 ## Key Features
 
@@ -51,6 +51,7 @@ Technical Support: github.com/8891689
 - **-R**: Activate random mode.
 - **-b**: Enable backup mode to resume from last progress (not for random mode).
 - **-G**: Specify the GPU ID to use, default is 0.
+-  **p**: Press the p key to pause your work and press it again to resume it.
 
 ## Example Output
 
