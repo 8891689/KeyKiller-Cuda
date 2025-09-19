@@ -3,7 +3,7 @@
 KeyKiller is the GPU-powered version of the KeyKiller project, designed to achieve extreme performance in solving Satoshi puzzles on modern NVIDIA GPUs. 
 Leveraging CUDA, warp-level parallelism, and batch EC operations, KeyKiller CUDA pushes the limits of cryptographic key search.
 
-1. The Secp256k1 algorithm is based on the excellent work of [JeanLucPons/VanitySearch](https://github.com/JeanLucPons/VanitySearch) ， [FixedPaul/VanitySearch-Bitcrack](https://github.com/FixedPaul)，This implementation is inspired and referenced by the above implementations. Contributions are welcome! The algorithm has been significantly modified for CUDA. Special thanks to Jean-Luc Pons for his pioneering contributions to the cryptography community.
+1. The Secp256k1 algorithm is based on the excellent work of [JeanLucPons/VanitySearch](https://github.com/JeanLucPons/VanitySearch) ， [FixedPaul/VanitySearch-Bitcrack](https://github.com/FixedPaul)，This implementation is based on modifications and improvements of the above implementation. Contributions are welcome! The algorithm has been significantly modified for CUDA. Special thanks to Jean-Luc Pons for his pioneering contributions to the cryptography community.
 
 2. KeyKiller GPU-based solution to Satoshi's puzzle. This is an experimental project, Please look at it rationally! 
 
